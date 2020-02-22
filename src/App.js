@@ -1,26 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import "./App.css";
+import CardList from "./CardList";
+import Form from "./Form";
+import Axios from "axios";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {
+    profiles: [],
+    addProfiles: ""
+  };
+
+  handleSubmit = async event => {
+    event.preventDefault();
+
+    const response = await Axios.get(
+      `https://api.github.com/users/${this.state.addProfiles}`
+    );
+
+    console.log("App", response.data);
+    this.setState(prevState => ({
+      profiles: [...prevState.profiles, response.data],
+      addProfiles: ""
+    }));
+  };
+
+  handleChange = event => {
+    this.setState({
+      addProfiles: event.target.value
+    });
+  };
+
+  render() {
+    return (
+      <div>
+        <header>
+          <h1>Github Cards App</h1>
+        </header>
+        <Form
+          addProfiles={this.state.addProfiles}
+          handleSubmit={this.handleSubmit}
+          handleChange={this.handleChange}
+        />
+        <CardList profiles={this.state.profiles} />
+      </div>
+    );
+  }
 }
 
 export default App;
